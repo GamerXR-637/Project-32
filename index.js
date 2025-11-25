@@ -1,9 +1,35 @@
 const readline = require("readline");
 const crypto = require('crypto');
 
-// function shambel() {
+function encodeText(text, key) {
+  let encoded = "";
+  for (let i = 0; i < text.length; i++) {
+    // XOR each character code with the key's character code (cycling through the key)
+    let charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+    encoded += String.fromCharCode(charCode);
+  }
+  // Convert to base64 for safe transport
+  return btoa(encoded);
+}
 
-// }
+function decodeText(encodedText, key) {
+  let decodedBase64 = atob(encodedText);
+  let decoded = "";
+  for (let i = 0; i < decodedBase64.length; i++) {
+    let charCode = decodedBase64.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+    decoded += String.fromCharCode(charCode);
+  }
+  return decoded;
+}
+
+function shambel(text, pass) {
+  if (text == "" || pass == "") {
+    return {output: "Need to input a text and a pass"}
+  } else {
+    let e = stringToBase16(text)
+    return {output: `${encodeText(e,pass)}`}
+  }
+}
 
 function stringToBase16(str) {
   let hexString = '';
@@ -50,5 +76,6 @@ rl.question('What is you username? ', (answer) => {
 
   rl.close();
     console.log(stringToBase16(answer))
-});
+    console.log(shambel(answer,pass))
+  });
 });
