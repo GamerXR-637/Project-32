@@ -1,53 +1,8 @@
-// const readline = require("readline");
-// const crypto = require('crypto');
+const path = require("path");
 
-// function encodeText(text, key) {
-//   let encoded = "";
-//   for (let i = 0; i < text.length; i++) {
-//     // XOR each character code with the key's character code (cycling through the key)
-//     let charCode = text.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-//     encoded += String.fromCharCode(charCode);
-//   }
-//   // Convert to base64 for safe transport
-//   return btoa(encoded);
-// }
+const currentDirectory = path.dirname(__filename);
 
-// function decodeText(encodedText, key) {
-//   let decodedBase64 = atob(encodedText);
-//   let decoded = "";
-//   for (let i = 0; i < decodedBase64.length; i++) {
-//     let charCode = decodedBase64.charCodeAt(i) ^ key.charCodeAt(i % key.length);
-//     decoded += String.fromCharCode(charCode);
-//   }
-//   return decoded;
-// }
-
-// function shambel(text, pass) {
-//   if (text == "" || pass == "") {
-//     return {output: "Need to input a text and a pass"}
-//   } else {
-//     let e = stringToBase16(text)
-//     return {output: `${encodeText(e,pass)}`}
-//   }
-// }
-
-// function stringToBase16(str) {
-//   let hexString = '';
-//   for (let i = 0; i < str.length; i++) {
-//     const charCode = str.charCodeAt(i);
-//     let hex = charCode.toString(10);
-//     if (hex.length === 1) {
-//       hex = '0' + hex;
-//     }
-//     hexString += hex;
-//   }
-//   return hexString;
-// }
-
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout,
-// });
+const cpath = path.dirname(currentDirectory);
 
 const colors = {
   reset: "\x1b[0m",
@@ -59,25 +14,6 @@ const colors = {
     cyan: "\x1b[36m",
   },
 };
-
-// let data = {
-//     name: "",
-//     shards: ""
-// }
-
-// rl.question('What is you username? ', (answer) => {
-//   // TODO: Log the answer in a database
-//   console.log(`Thanks`);
-
-//   rl.question('Password? ', (pass) => {
-//   // TODO: Log the answer in a database
-//   console.log(`Thanks`);
-
-//   rl.close();
-//     console.log(stringToBase16(answer))
-//     console.log(shambel(answer,pass))
-//   });
-// });
 
 function string() {
   const characters =
@@ -133,14 +69,40 @@ function folder() {
   return s;
 }
 
+function randomPath(basePath) {
+  let newPath = basePath;
+  const depth = Math.floor(Math.random() * 3) + 1; // How many subfolders, 1 to 3
+
+  for (let i = 0; i < depth; i++) {
+    let segment = string();
+    newPath = path.join(newPath, segment);
+  }
+  return newPath;
+}
+
 (async () => {
   const limit = Math.floor(5 + Math.random() * 10 * 2);
-  await load("Setting up system reset", 10);
+  console.log(cpath);
   console.log("");
+  await load("Setting up system reset", limit - 5);
+  console.log("");
+  let c = 0;
+  let d = 0;
   for (let i = 1; i < limit; i++) {
     let m = Math.random() < 0.5 ? toFile(string()) : folder();
-    console.log("Deleting file " + m);
+    let rand = Math.random();
+    let counter = rand < 0.5 ? (d += 1) : (c += 1);
+
+    let n =
+      rand < 0.5
+        ? `${colors.fg.red}Deleting${colors.reset}`
+        : `${colors.fg.green}Creating${colors.reset}`;
+    const fullPath = path.join(randomPath(cpath), m);
+    console.log(`${n} item: ${fullPath}`);
     let r = Math.floor(Math.random() * 2);
     await sleep(r);
   }
+  console.log(
+    `${colors.fg.red}${d}${colors.reset} items were deleted and ${colors.fg.green}${c}${colors.reset} were created`
+  );
 })();
