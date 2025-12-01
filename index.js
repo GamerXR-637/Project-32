@@ -1,7 +1,5 @@
 const path = require("path");
-
 const currentDirectory = path.dirname(__filename);
-
 const cpath = path.dirname(currentDirectory);
 
 const colors = {
@@ -48,18 +46,37 @@ function toFile(input) {
 }
 
 async function load(message, n) {
-  if (message === "" || typeof n === "string") {
-    return "Need a message or n is a string";
+  if (typeof message !== "string" || message.length === 0 || typeof n !== "number" || Number.isNaN(n)) {
+    return "Need a non-empty message and a numeric n";
   } else if (n <= 0) {
     return "N need to be a number bigger than 0";
   }
   const targetFrames = ["|", "/", "—", "\\"];
+  // const targetFrames = ["▒▒▒▒▒▒▒▒▒▒","█▒▒▒▒▒▒▒▒▒","██▒▒▒▒▒▒▒▒","███▒▒▒▒▒▒▒","████▒▒▒▒▒▒", "█████▒▒▒▒▒", "██████▒▒▒▒", "███████▒▒▒", "████████▒▒", "█████████▒", "██████████"];
+  
   process.stdout.write(`${message}: [ ]`);
   for (let i = 0; i < n; i++) {
     await sleep(0.2);
     process.stdout.write(
       `\r${message}: [${targetFrames[i % targetFrames.length]}]`
     );
+  }
+}
+
+async function generate(n) {
+  for (let i = 0; i < n; i++) {
+    let messages = [
+      `Reading ${string()}`,
+      `Editing ${string()}`,
+      `Starting ${string()}`,
+      `Adding ${string()} to system`,
+      `Installing ${string()} package`,
+      `Error at ${string()}`,
+    ];
+
+    let message = messages[Math.floor(Math.random() * messages.length)];
+    await sleep(Math.floor(Math.random() * 3));
+    console.log(`${message}`);
   }
 }
 
@@ -83,26 +100,36 @@ function randomPath(basePath) {
 (async () => {
   const limit = Math.floor(5 + Math.random() * 10 * 2);
   console.log(cpath);
+  await generate(Math.floor(4 + Math.random() * 20))
   console.log("");
-  await load("Setting up system reset", limit - 5);
-  console.log("");
+  await sleep(2)
+  console.clear();
+  await load("Setting up system reset", limit * 5);
+  await sleep(2)
+  console.clear();
   let c = 0;
   let d = 0;
   for (let i = 1; i < limit; i++) {
     let m = Math.random() < 0.5 ? toFile(string()) : folder();
     let rand = Math.random();
-    let counter = rand < 0.5 ? (d += 1) : (c += 1);
+    if (rand < 0.5) {
+      d += 1;
+    } else {
+      c += 1;
+    }
 
-    let n =
+    let action =
       rand < 0.5
         ? `${colors.fg.red}Deleting${colors.reset}`
         : `${colors.fg.green}Creating${colors.reset}`;
     const fullPath = path.join(randomPath(cpath), m);
-    console.log(`${n} item: ${fullPath}`);
+    console.log(`${action} item: ${fullPath}`);
     let r = Math.floor(Math.random() * 2);
     await sleep(r);
   }
   console.log(
     `${colors.fg.red}${d}${colors.reset} items were deleted and ${colors.fg.green}${c}${colors.reset} were created`
   );
+  await sleep(2)
+  console.clear();
 })();
